@@ -1,16 +1,10 @@
-// import 'dart:async';
-//
-// import 'package:flutter/material.dart';
-// import 'package:geolocator/geolocator.dart';
-
 import 'dart:io';
-
 import 'package:android_intent/android_intent.dart';
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -19,11 +13,13 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'GeoPosition Demo',
       home: GeoPositionCheckScreen(),
     );
   }
+
 }
 
 class GeoPositionCheckScreen extends StatefulWidget {
@@ -33,26 +29,31 @@ class GeoPositionCheckScreen extends StatefulWidget {
 
 class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
   bool isLocationServiceEnabled = false;
+  bool isLocationPermissionGranted = false;
+
 
   @override
   void initState() {
     super.initState();
     checkLocationService();
+    checkLocationPermission();
+
   }
+
 
   Future<void> checkLocationService() async {
     isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
-    if (isLocationServiceEnabled) {
+    print(isLocationPermissionGranted);
+    print(isLocationServiceEnabled);
+
+    if (isLocationServiceEnabled && isLocationPermissionGranted) {
       // Геопозиция включена, продолжаем с приложением
       // Вместо простого вывода на консоль, вы можете перейти к основному экрану вашего приложения
-      print('Location services are enabled.');
-      showLocationServiceDisabledDialog();
-
+      getPosition();
     } else {
       // Геопозиция отключена, показываем всплывающее окно
       showLocationServiceDisabledDialog();
-      print("they're off");
     }
   }
 
@@ -101,6 +102,8 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
 
   @override
   Widget build(BuildContext context) {
+    checkLocationPermission(); // Проверяем разрешение на геопозицию при запуске приложения
+
     return Scaffold(
       appBar: AppBar(
         title: Text('GeoPosition Demo'),
@@ -109,12 +112,35 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
         child: Text('Главный экран'),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () { 
+        onPressed: () {
           checkLocationService();
         },
         child: Text("нажми"),
       ),
     );
+  }
+
+  Future<void> checkLocationPermission() async {
+    PermissionStatus permissionStatus = await Permission.location.status;
+    setState(() {
+      isLocationPermissionGranted = permissionStatus == PermissionStatus.granted;
+    });
+  }
+  void getPosition() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+
+      print('Latitude: $latitude');
+      print('Longitude: $longitude');
+    } catch (e) {
+      // Обработка ошибок
+      print('Error: $e');
+    }
   }
 }
 
