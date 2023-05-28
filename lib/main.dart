@@ -197,17 +197,25 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
               Expanded(
                 flex: 3,
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.black,
-                      width: 1.0,
-                    ),
-                  ),
+                  // decoration: BoxDecoration(
+                  //   border: Border.all(
+                  //     color: Colors.black,
+                  //     width: 1.0,
+                  //   ),
+                  // ),
                   child: Center(
-                    child: Text('Second Row - Full Width'),
+                    child: Text(
+                        '10 km/h',
+                      style: TextStyle(
+                        color: Color.fromRGBO(230, 230, 230, 100),
+                        fontSize: 100,
+                        fontWeight: FontWeight.w500
+                      ),
+                    ),
                   ),
                 ),
               ),
+              //third and fourth rows are for some other iformation like Voltage, Temperature, etc
               Expanded(
                 flex: 2,
                 child: Row(
