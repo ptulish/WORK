@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:math';
 
 
 void main() {
@@ -30,6 +32,8 @@ class GeoPositionCheckScreen extends StatefulWidget {
 class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
   bool isLocationServiceEnabled = false;
   bool isLocationPermissionGranted = false;
+  int batteryLevel = 100;
+
 
 
   @override
@@ -104,18 +108,175 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
   Widget build(BuildContext context) {
     checkLocationPermission(); // Проверяем разрешение на геопозицию при запуске приложения
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('GeoPosition Demo'),
-      ),
-      body: Center(
-        child: Text('Главный экран'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          checkLocationService();
-        },
-        child: Text("нажми"),
+
+
+
+    return MaterialApp(
+      title: 'Grid Example',
+      home: Scaffold(
+        backgroundColor: Color.fromRGBO(0, 114, 143, 80),
+        // appBar: AppBar(
+        //   title: Text('Grid Example'),
+        // ),
+        body:
+        Padding(padding: EdgeInsets.only(top: 23, left: 2, right: 2, bottom: 2),
+          child: Column(
+            children: [
+              //first row with logo and template for battery
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        // decoration: BoxDecoration(
+                        //   border: Border.all(
+                        //     color: Colors.black,
+                        //     width: 1.0,
+                        //   ),
+                        // ),
+                        child: Center(
+                          child:
+                            Padding(padding: EdgeInsets.all(5),
+                              //logo SYLENTS
+                              child: SvgPicture.asset(
+                              'assets/sylents-claim.svg',
+                              width: 100,  // Укажите требуемую ширину
+                              height: 100, // Укажите требуемую высоту
+                            ),
+                              //logo as in presentation
+                              // child: Image(
+                              //   image: AssetImage('assets/logo.png'),
+                              // ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        // decoration: BoxDecoration(
+                        //   border: Border.all(
+                        //     color: Colors.black,
+                        //     width: 1.0,
+                        //   ),
+                        // ),
+                        child: Center(
+                          child: Stack(
+                            children: [
+                              Center(
+                                child:
+                                Transform.rotate(angle: pi / 2, child: Icon(
+                                  Icons.battery_full,
+                                  size: 100,
+                                  color: Colors.white,
+
+                                ),
+                                ),
+
+                              ),
+                              Center(
+                                child: Text(
+                                  '$batteryLevel %',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.deepOrangeAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 60 * 0.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //second row fith template for speedometer
+              Expanded(
+                flex: 3,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text('Second Row - Full Width'),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text('Third Row - Column 1'),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text('Third Row - Column 2'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text('Fourth Row - Column 1'),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text('Fourth Row - Column 2'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
