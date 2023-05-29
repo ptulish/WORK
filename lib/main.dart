@@ -33,7 +33,11 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
   bool isLocationServiceEnabled = false;
   bool isLocationPermissionGranted = false;
   int batteryLevel = 100;
-
+  double voltage = 0.5;
+  double current = 1.3;
+  double temperature = 60.1;
+  String regime = "Sport";
+  String status = "Everything is okay";
 
 
   @override
@@ -43,7 +47,6 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
     checkLocationPermission();
 
   }
-
 
   Future<void> checkLocationService() async {
     isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -108,9 +111,6 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
   Widget build(BuildContext context) {
     checkLocationPermission(); // Проверяем разрешение на геопозицию при запуске приложения
 
-
-
-
     return MaterialApp(
       title: 'Grid Example',
       home: Scaffold(
@@ -119,7 +119,7 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
         //   title: Text('Grid Example'),
         // ),
         body:
-        Padding(padding: EdgeInsets.only(top: 23, left: 2, right: 2, bottom: 2),
+        Padding(padding: EdgeInsets.only(top: 23, left: 3, right: 3, bottom: 1),
           child: Column(
             children: [
               //first row with logo and template for battery
@@ -128,27 +128,19 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        // decoration: BoxDecoration(
-                        //   border: Border.all(
-                        //     color: Colors.black,
-                        //     width: 1.0,
-                        //   ),
-                        // ),
-                        child: Center(
-                          child:
-                            Padding(padding: EdgeInsets.all(5),
-                              //logo SYLENTS
-                              child: SvgPicture.asset(
-                              'assets/sylents-claim.svg',
-                              width: 100,  // Укажите требуемую ширину
-                              height: 100, // Укажите требуемую высоту
-                            ),
-                              //logo as in presentation
-                              // child: Image(
-                              //   image: AssetImage('assets/logo.png'),
-                              // ),
+                      child: Center(
+                        child:
+                          Padding(padding: EdgeInsets.all(5),
+                            //logo SYLENTS
+                            child: SvgPicture.asset(
+                            'assets/sylents-claim.svg',
+                            width: 100,  // Укажите требуемую ширину
+                            height: 100, // Укажите требуемую высоту
                           ),
+                            //logo as in presentation
+                            // child: Image(
+                            //   image: AssetImage('assets/logo.png'),
+                            // ),
                         ),
                       ),
                     ),
@@ -179,7 +171,7 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
                                   '$batteryLevel %',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: Colors.deepOrangeAccent,
+                                    color: Color.fromRGBO(0, 79, 99, 100),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 60 * 0.4,
                                   ),
@@ -221,28 +213,44 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
+                      child:
+                      Container(
+                        width: 200,
+                        height: 200,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
+                          color: Color(0xFF2BB8C9),
+                          borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
                         ),
+                        //Voltage
                         child: Center(
-                          child: Text('Third Row - Column 1'),
+                          child: Text(
+                            '$voltage V',
+                            style: TextStyle(
+                              fontSize: 50,
+                              color: Colors.white
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     Expanded(
                       child: Container(
+                        width: 200,
+                        height: 200,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
+                          color: Color(0xFF2BB8C9),
+                          borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
                         ),
                         child: Center(
-                          child: Text('Third Row - Column 2'),
+                          child: Text(
+                            '$current A',
+                            style: TextStyle(
+                                fontSize: 50,
+                                color: Colors.white
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -255,32 +263,101 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
                   children: [
                     Expanded(
                       child: Container(
+                        width: 200,
+                        height: 200,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
+                          color: Color(0xFF2BB8C9),
+                          borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
                         ),
                         child: Center(
-                          child: Text('Fourth Row - Column 1'),
+                          child: Text(
+                            '$temperature° С',
+                            style: TextStyle(
+                                fontSize: 50,
+                                color: Colors.white
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     Expanded(
                       child: Container(
+                        width: 200,
+                        height: 200,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
+                          color: Color(0xFF2BB8C9),
+                          borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
                         ),
                         child: Center(
-                          child: Text('Fourth Row - Column 2'),
+                          child: Text(
+                            '$regime',
+                            style: TextStyle(
+                                fontSize: 50,
+                                color: Colors.white
+                            ),
+                          ),
                         ),
                       ),
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     border: Border.all(
+                      //       color: Colors.black,
+                      //       width: 1.0,
+                      //     ),
+                      //   ),
+                      //   child: Center(
+                      //     child: Text('Fourth Row - Column 2'),
+                      //   ),
+                      // ),
                     ),
                   ],
                 ),
+              ),
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2BB8C9),
+                    borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Status: $status',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    )
+                  )
+                ),
+                // child: Row(
+                //   children: [
+                //     Expanded(
+                //       child: Container(
+                //         width: 200,
+                //         height: 100,
+                //         margin: EdgeInsets.all(5),
+                //         decoration: BoxDecoration(
+                //           color: Color(0xFF2BB8C9),
+                //           borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
+                //         ),
+                //         child: Center(
+                //           child: Expanded(
+                //             child: Text(
+                //               'Status: $status',
+                //               style: TextStyle(
+                //                 fontSize: 20,
+                //
+                //               ),
+                //             ),
+                //           ),
+                //
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ),
             ],
           ),
