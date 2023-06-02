@@ -37,6 +37,7 @@ dependencies:
   android_intent: ^2.0.0
   permission_handler: ^10.2.0
   flutter_svg: ^0.22.0
+  flutter_blue_plus: ^1.5.2
 
 
 
