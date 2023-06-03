@@ -309,8 +309,7 @@ class _GeoPositionCheckScreenState extends State<GeoPositionCheckScreen> {
                     margin: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color: Color(0xFF2BB8C9),
-                      borderRadius: BorderRadius.circular(
-                          10), // Set the border radius to make corners rounded
+                      borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
                     ),
                     child: Center(
                         child: Text(

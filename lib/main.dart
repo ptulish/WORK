@@ -5,7 +5,7 @@ import 'pages/scan.dart';
 void main() => runApp(
     MaterialApp(
       theme: ThemeData(
-        primaryColor: Color.fromRGBO(0, 114, 143, 80),
+        primaryColor: const Color.fromRGBO(0, 114, 143, 80),
       ),
       initialRoute: '/scan',
       routes: {
