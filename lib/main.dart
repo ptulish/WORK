@@ -10,7 +10,7 @@ void main() => runApp(
       ),
       initialRoute: '/scan',
       routes: {
-        '/': (context) => const MainScreen(),
+        '/': (context) => MainScreen(),
         '/scan': (context) => const Scan(),
       },
     )

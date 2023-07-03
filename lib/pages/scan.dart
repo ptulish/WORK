@@ -23,15 +23,13 @@ class _ScanState extends State<Scan> {
     if(isConnected == true){
       device?.disconnect();
     }
-    print("opened");
     super.initState();
     bluetoothCheck();
     findDevices();
-    print(listOfDevices.length);
   }
 
   Future<String> _loadData() async {
-    await Future.delayed(Duration(seconds: 3)); // Имитация долгой загрузки данных
+    await Future.delayed(const Duration(seconds: 3)); // Имитация долгой загрузки данных
     return 'Loaded Data'; // Здесь должны быть ваши загруженные данные
   }
 
@@ -150,15 +148,12 @@ class _ScanState extends State<Scan> {
                                       child: Align(
                                         alignment: Alignment.centerRight,
                                         child: OutlinedButton(
-                                          onPressed: () {
-                                            connectDevice(listOfDevices.elementAt(index));
-                                            print("object");
+                                          onPressed: () async {
+                                            await connectDevice(listOfDevices.elementAt(index));
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(builder: (context) => MainScreen(device: device)),
                                             );
-
-                                            // Navigator.pushNamed(context, '/');
                                           },
                                           style: ElevatedButton.styleFrom(
                                             shape: RoundedRectangleBorder(
@@ -196,11 +191,11 @@ class _ScanState extends State<Scan> {
       device?.disconnect();
     }
 
-    flutterBlue.startScan(timeout: Duration(seconds: 4));
+    flutterBlue.startScan(timeout: const Duration(seconds: 4));
 
     var scanSubscription = flutterBlue.scanResults.listen((results) async {
       for (ScanResult result in results) {
-        String deviceName = result.device.name ?? "";
+        String deviceName = result.device.name;
         // print(result.device.name);
 
         if (deviceName.startsWith("SY2")) {
@@ -209,44 +204,53 @@ class _ScanState extends State<Scan> {
         }
       }
       listOfDevices = deviceSet.toList();
-      if(listOfDevices.isNotEmpty && kDebugMode){
-        print("listofDevaces[0]:   ${listOfDevices[0]}");
-      }
     });
 
     if (kDebugMode) {
       print(scanSubscription);
     }
-    // Не забудьте преобразовать Set обратно в список, когда сканирование закончено
-
   }
 
-
-  void connectDevice(String deviceNameToConnect) async {
+  Future<void> connectDevice(String deviceNameToConnect) async {
     // Start scanning
-    flutterBlue.startScan(timeout: Duration(seconds: 4));
+    flutterBlue.startScan(timeout: const Duration(seconds: 1));
 
     BluetoothDevice? targetDevice;
 
     var subscription = flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
-        print(result.device.name);
         if (result.device.name == deviceNameToConnect) {
           targetDevice = result.device;
+          device = result.device;  // обновите device тут
+          ConnectedDevice.instance.device = targetDevice;
           break;
         }
       }
     });
+    if(kDebugMode){
+      print(subscription);
+    }
 
     // Delay stopping scan to ensure scan has had time to complete
-    await Future.delayed(Duration(seconds: 5)).then((_) => flutterBlue.stopScan());
+    await Future.delayed(const Duration(seconds: 1)).then((_) => flutterBlue.stopScan());
 
     if (targetDevice != null) {
       // Connect to the device
-      await targetDevice?.connect();
-      print('Connected to ${targetDevice?.name}');
+      if (await targetDevice?.state == BluetoothDeviceState.connected) {
+        if (kDebugMode) {
+          print('Device is already connected');
+        }
+      } else {
+        // Connect to the device
+        await targetDevice?.connect();
+        if (kDebugMode) {
+          print('Connected to ${targetDevice?.name}');
+        }
+      }
     } else {
-      print('Target Device Not Found');
+      if (kDebugMode) {
+        print('Target Device Not Found');
+      }
     }
   }
 
@@ -269,9 +273,9 @@ class _ScanState extends State<Scan> {
       return;
     }
 
-    if (kDebugMode) {
-      print("is available: $isBluetoothAvailable is on: $isBluetoothEnabled");
-    }
+    // if (kDebugMode) {
+    //   print("is available: $isBluetoothAvailable is on: $isBluetoothEnabled");
+    // }
 
   }
 }

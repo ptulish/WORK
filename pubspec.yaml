@@ -38,6 +38,7 @@ dependencies:
   permission_handler: ^10.2.0
   flutter_svg: ^0.22.0
   flutter_blue_plus: ^1.5.2
+  logger: ^1.4.0
 
 
 
