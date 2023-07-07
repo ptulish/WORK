@@ -1,16 +1,24 @@
-# workproject
+# SYLENTS mobile app
 
-A new Flutter project.
+An ap to monitore a vesc motor installed on a boat.
 
-## Getting Started
+## Connecting screen
 
-This project is a starting point for a Flutter application.
+Here you can see some Bluetooth devices nearby. You can connect to one of them.
+After click to "Connect" button you will be redirected to main_screen.
 
-A few resources to get you started if this is your first Flutter project:
+## Main screen
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Here you can see some parameters like battery, power, current etc.
+//TODO: implement disconecting screen & logik
+//TODO: design like in Figma 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## how to run the app
+(for android studio)
+go to pubspec.yaml and click pub get 
+then connect to your phone and run the app 
+
+or
+you have to run in terminal in the app dictionary
+$ flutter pub get 
+to get dependencies and then build it and run on your phone
