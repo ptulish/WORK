@@ -5,6 +5,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:logger/logger.dart';
@@ -165,26 +166,61 @@ ESCTelemetry processSetupValues(Uint8List payload) {
   int index = 1;
   ESCTelemetry telemetryPacket = new ESCTelemetry();
 
+  print("PAyload: ${payload}");
   telemetryPacket.temp_mos = buffer_get_float16(payload, index, 10.0); index += 2;
   telemetryPacket.temp_motor = buffer_get_float16(payload, index, 10.0); index += 2;
   telemetryPacket.current_motor = buffer_get_float32(payload, index, 100.0); index += 4;
   telemetryPacket.current_in = buffer_get_float32(payload, index, 100.0); index += 4;
+  telemetryPacket.foc_id = buffer_get_float32(payload, index, 100.0); index += 4;
+  telemetryPacket.foc_iq = buffer_get_float32(payload, index, 100.0); index += 4;
   telemetryPacket.duty_now = buffer_get_float16(payload, index, 1000.0); index += 2;
   telemetryPacket.rpm = buffer_get_float32(payload, index, 1.0); index += 4;
-  telemetryPacket.speed = buffer_get_float32(payload, index, 1000.0); index += 4;
   telemetryPacket.v_in = buffer_get_float16(payload, index, 10.0); index += 2;
-  telemetryPacket.battery_level = buffer_get_float16(payload, index, 1000.0); index += 2;
   telemetryPacket.amp_hours = buffer_get_float32(payload, index, 10000.0); index += 4;
   telemetryPacket.amp_hours_charged = buffer_get_float32(payload, index, 10000.0); index += 4;
   telemetryPacket.watt_hours = buffer_get_float32(payload, index, 10000.0); index += 4;
   telemetryPacket.watt_hours_charged = buffer_get_float32(payload, index, 10000.0); index += 4;
-  telemetryPacket.tachometer = buffer_get_float32(payload, index, 1000.0).toInt(); index += 4;
-  telemetryPacket.tachometer_abs = buffer_get_float32(payload, index, 1000.0).toInt(); index += 4;
-  telemetryPacket.position = buffer_get_float32(payload, index, 1e6); index += 4;
+  telemetryPacket.tachometer = buffer_get_int32(payload, index); index += 4;
+  telemetryPacket.tachometer_abs = buffer_get_int32(payload, index); index += 4;
   telemetryPacket.fault_code = mc_fault_code.values[payload[index++]];
+  telemetryPacket.position = buffer_get_float32(payload, index, 1000000.0); index += 4;
   telemetryPacket.vesc_id = payload[index++];
-  telemetryPacket.num_vescs = payload[index++];
-  telemetryPacket.battery_wh = buffer_get_float32(payload, index, 1000.0); index += 4;
+  telemetryPacket.temp_mos_1 = buffer_get_float16(payload, index, 10.0); index += 2;
+  telemetryPacket.temp_mos_2 = buffer_get_float16(payload, index, 10.0); index += 2;
+  telemetryPacket.temp_mos_3 = buffer_get_float16(payload, index, 10.0); index += 2;
+  telemetryPacket.vd = buffer_get_float32(payload, index, 100.0); index += 4;
+  telemetryPacket.vq = buffer_get_float32(payload, index, 100.0);
+
+  print("temp_mos: ${telemetryPacket.temp_mos}\n"
+      "temp_motor ${telemetryPacket.temp_motor}\n"
+      "current_motor: ${telemetryPacket.current_motor}\n"
+      "current_in: ${telemetryPacket.current_in}\n"
+      "foc_id: ${telemetryPacket.foc_id}\n"
+      "foc_iq: ${telemetryPacket.foc_iq}\n"
+      "duty_now: ${telemetryPacket.duty_now}\n"
+      "rpm: ${telemetryPacket.rpm}\n"
+      // "speed: ${telemetryPacket.speed}"
+      "v_in: ${telemetryPacket.v_in}\n"
+      // "battery_level: ${telemetryPacket.battery_level}"
+      "amp_hours: ${telemetryPacket.amp_hours}\n"
+      "amp_hours_charged: ${telemetryPacket.amp_hours_charged}\n"
+      "watt_hours: ${telemetryPacket.watt_hours}\n"
+      "watt_hours_charged: ${telemetryPacket.watt_hours_charged}\n"
+      "tachometer: ${telemetryPacket.tachometer}\n"
+      "tachometer_abs: ${telemetryPacket.tachometer_abs}\n"
+      "position: ${telemetryPacket.position}\n"
+      "fault_code: ${telemetryPacket.fault_code}\n"
+      "vesc_id: ${telemetryPacket.vesc_id}\n"
+      "num_vescs: ${telemetryPacket.num_vescs}\n"
+      "battery_wh: ${telemetryPacket.battery_wh}\n"
+      "vd: ${telemetryPacket.vd}\n"
+      "vq: ${telemetryPacket.vq}\n"
+      "temp_mos1: ${telemetryPacket.temp_mos_1}\n"
+      "temp_mos2: ${telemetryPacket.temp_mos_2}\n"
+      "temp_mos3: ${telemetryPacket.temp_mos_3}\n"
+  );
+
+  print("index: $index, payload: ${payload.length}");
 
   return telemetryPacket;
 }
@@ -251,10 +287,12 @@ double ldexpf(double arg, int exp) {
 }
 
 ESCFirmware processFirmware(Uint8List payload) {
+  int id = payload[0];
   int index = 1;
   ESCFirmware firmwarePacket = new ESCFirmware();
   firmwarePacket.fw_version_major = payload[index++];
   firmwarePacket.fw_version_minor = payload[index++];
+  print("POCKET ID : $id");
 
   Uint8List hardwareBytes = new Uint8List(30);
   int i = 0;

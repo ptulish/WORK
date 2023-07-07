@@ -1,3 +1,4 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -7,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:workproject/bleHelper.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:workproject/globalUtilities.dart';
@@ -42,6 +44,9 @@ class _MainScreen extends State<MainScreen> {
   static ESCTelemetry telemetryPacket = new ESCTelemetry();
   static Uint8List payload = new Uint8List(512);
   static ESCFirmware firmwarePacket = new ESCFirmware();
+  static Map<int, ESCTelemetry> telemetryMap = new Map();
+  BLEHelper bleHelper = new BLEHelper();
+
 
 
   @override
@@ -361,18 +366,51 @@ class _MainScreen extends State<MainScreen> {
     } catch (e) {
       print("Failed to setup notifications: $e");
     }
+    int index = 0;
+    int payloadLength = 0;
+    int packetLength = 0;
+    List<int> list = [];
 
     rx.value.listen((value) {
       // тут обработка полученных данных
       print("Received data: $value");
-
-      if(value.length == 20){
-        workWithList(value);
+      if(index == 0){
+        packetLength = value[0];
+        if(packetLength == 2){
+          payloadLength = value[1];
+        } else if (packetLength == 3){
+          payloadLength = (value[1] << 8) | value[2];
+        }
+        index++;
+        return;
       }
+
+      if(index >= 1){
+        value.forEach((element) {
+          list.add(element);
+        });
+      }
+
+      if(list.length == payloadLength + 3){
+        switch(list[0]){
+          case 1:
+            workWithFirmWare(list);
+            break;
+          case 4:
+            workWithTelemetry(list);
+            break;
+          default:
+            print("NEW NOT IMPLEMENTED COMMAND");
+            break;
+        }
+        index = 0; payloadLength = 0; packetLength = 0;
+      }
+      index++;
+
     });
 
 
-    Uint8List packet = simpleVESCRequest(COMM_PACKET_ID.COMM_FW_VERSION.index);;
+    Uint8List packet = simpleVESCRequest(COMM_PACKET_ID.COMM_GET_VALUES.index);;
 
     // Request COMM_GET_VALUES_SETUP from the ESC
     if (!await sendBLEData(tx, packet, true)) {
@@ -381,26 +419,10 @@ class _MainScreen extends State<MainScreen> {
       print("Hello this is sendBLEData");
     }
 
-    firmwarePacket = processFirmware(packet);
-
-    var major = firmwarePacket.fw_version_major;
-    var minor = firmwarePacket.fw_version_minor;
-    var hardName = firmwarePacket.hardware_name;
-    globalLogger.d("Firmware packet: major $major, minor $minor, hardware $hardName");
-    print("Firmware packet: major $major, minor $minor, hardware $hardName");
-
-    //
-    // telemetryPacket = processSetupValues(bleHelper.getPayload());
-    //
-    // // Update map of ESC telemetry
-    // telemetryMap[telemetryPacket.vesc_id] = telemetryPacket;
-
-
-
     print("after rx tx");
   }
 
-  void workWithList(List<int> value) {
+  void workWithFirmWare(List<int> value) {
 
     Uint8List firmwarePacket1 = Uint8List.fromList(value);
     firmwarePacket = processFirmware(firmwarePacket1);
@@ -409,6 +431,14 @@ class _MainScreen extends State<MainScreen> {
     var minor = firmwarePacket.fw_version_minor;
     var hardName = firmwarePacket.hardware_name;
     globalLogger.d("Firmware packet: major $major, minor $minor, hardware $hardName");
+
+  }
+
+  void workWithTelemetry(List<int> value) {
+    telemetryPacket = processSetupValues(Uint8List.fromList(value));
+
+    // Update map of ESC telemetry
+    telemetryMap[telemetryPacket.vesc_id] = telemetryPacket;
 
   }
 
