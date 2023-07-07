@@ -13,6 +13,7 @@ import 'dart:math';
 import 'dart:async';
 import 'package:workproject/globalUtilities.dart';
 
+import '../Components/crc16.dart';
 import '../dataTypes.dart';
 
 
@@ -390,8 +391,22 @@ class _MainScreen extends State<MainScreen> {
           list.add(element);
         });
       }
+      int crc = 0;
+      if(list.length == payloadLength){
+        List<int> listForCRC = [...list];
+        listForCRC.insert(0, 74);
+        listForCRC.insert(0, 2);
+
+        print("list for crc: ${listForCRC}");
+
+        Uint8List uintlist = Uint8List.fromList(listForCRC);
+        crc = CRC16.crc16(uintlist, 0, uintlist.length);
+        print("crc check sum: ${crc}");
+      }
 
       if(list.length == payloadLength + 3){
+
+
         switch(list[0]){
           case 1:
             workWithFirmWare(list);
@@ -399,13 +414,21 @@ class _MainScreen extends State<MainScreen> {
           case 4:
             workWithTelemetry(list);
             break;
+          case 47:
+            workWithTelemetrySetup(list);
+            break;
           default:
             print("NEW NOT IMPLEMENTED COMMAND");
             break;
         }
         index = 0; payloadLength = 0; packetLength = 0;
+        print(value);
+        int checksum = CRC16.crc16(Uint8List.fromList([value[0], value[1]]), 0, value.length - 1);
+
+        print("Checksum: ${checksum}");
       }
       index++;
+
 
     });
 
@@ -434,8 +457,15 @@ class _MainScreen extends State<MainScreen> {
 
   }
 
-  void workWithTelemetry(List<int> value) {
+  void workWithTelemetrySetup(List<int> value){
     telemetryPacket = processSetupValues(Uint8List.fromList(value));
+
+    // Update map of ESC telemetry
+    telemetryMap[telemetryPacket.vesc_id] = telemetryPacket;
+  }
+
+  void workWithTelemetry(List<int> value) {
+    telemetryPacket = processTelemetry(Uint8List.fromList(value));
 
     // Update map of ESC telemetry
     telemetryMap[telemetryPacket.vesc_id] = telemetryPacket;

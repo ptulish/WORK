@@ -166,6 +166,35 @@ ESCTelemetry processSetupValues(Uint8List payload) {
   int index = 1;
   ESCTelemetry telemetryPacket = new ESCTelemetry();
 
+  telemetryPacket.temp_mos = buffer_get_float16(payload, index, 10.0); index += 2;
+  telemetryPacket.temp_motor = buffer_get_float16(payload, index, 10.0); index += 2;
+  telemetryPacket.current_motor = buffer_get_float32(payload, index, 100.0); index += 4;
+  telemetryPacket.current_in = buffer_get_float32(payload, index, 100.0); index += 4;
+  telemetryPacket.duty_now = buffer_get_float16(payload, index, 1000.0); index += 2;
+  telemetryPacket.rpm = buffer_get_float32(payload, index, 1.0); index += 4;
+  telemetryPacket.speed = buffer_get_float32(payload, index, 1000.0); index += 4;
+  telemetryPacket.v_in = buffer_get_float16(payload, index, 10.0); index += 2;
+  telemetryPacket.battery_level = buffer_get_float16(payload, index, 1000.0); index += 2;
+  telemetryPacket.amp_hours = buffer_get_float32(payload, index, 10000.0); index += 4;
+  telemetryPacket.amp_hours_charged = buffer_get_float32(payload, index, 10000.0); index += 4;
+  telemetryPacket.watt_hours = buffer_get_float32(payload, index, 10000.0); index += 4;
+  telemetryPacket.watt_hours_charged = buffer_get_float32(payload, index, 10000.0); index += 4;
+  telemetryPacket.tachometer = buffer_get_float32(payload, index, 1000.0).toInt(); index += 4;
+  telemetryPacket.tachometer_abs = buffer_get_float32(payload, index, 1000.0).toInt(); index += 4;
+  telemetryPacket.position = buffer_get_float32(payload, index, 1e6); index += 4;
+  telemetryPacket.fault_code = mc_fault_code.values[payload[index++]];
+  telemetryPacket.vesc_id = payload[index++];
+  telemetryPacket.num_vescs = payload[index++];
+  telemetryPacket.battery_wh = buffer_get_float32(payload, index, 1000.0); index += 4;
+
+
+  return telemetryPacket;
+}
+
+ESCTelemetry processTelemetry(Uint8List payload) {
+  int index = 1;
+  ESCTelemetry telemetryPacket = new ESCTelemetry();
+
   print("PAyload: ${payload}");
   telemetryPacket.temp_mos = buffer_get_float16(payload, index, 10.0); index += 2;
   telemetryPacket.temp_motor = buffer_get_float16(payload, index, 10.0); index += 2;
