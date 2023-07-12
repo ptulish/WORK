@@ -73,6 +73,7 @@ flutter:
   assets:
     - assets/sylents-claim.svg
     - assets/logo.png
+    - assets/logo1.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
