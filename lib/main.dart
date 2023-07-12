@@ -7,7 +7,7 @@ void main() => runApp(
       theme: ThemeData(
         primaryColor: const Color.fromRGBO(0, 114, 143, 80),
       ),
-      initialRoute: '/scan',
+      initialRoute: '/',
       routes: {
         '/': (context) => MainScreen(),
         '/scan': (context) => const Scan(),

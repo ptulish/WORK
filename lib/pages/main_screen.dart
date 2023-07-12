@@ -144,7 +144,7 @@ class _MainScreen extends State<MainScreen> {
             children: [
               //first row with logo and template for battery
               Expanded(
-                flex: 1,
+                flex: 12,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -168,13 +168,11 @@ class _MainScreen extends State<MainScreen> {
                           // Handle menu button press
                         },
                       ),
-                      // Expanded(
-                        //   child:
                 ]),
               ),
-              //second row fith template for speedometer
+              //second row with template for speedometer
               Expanded(
-                flex: 3,
+                flex: 35,
                 child: Row(
                   children: <Widget>[
                     // First column - 20%
@@ -225,129 +223,193 @@ class _MainScreen extends State<MainScreen> {
                   ],
                 )
               ),
+              Expanded(
+                flex: 54,
+                  child: Padding(
+                    child: Column (
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Row(
+                            children: [
+                              //Voltage
+                              Expanded(
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2BB8C9),
+                                    borderRadius: BorderRadius.circular(5), // Set the border radius to make corners rounded
+                                  ),
+                                  child: Padding(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'VOLTAGE',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white30,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),  // Add some space between the two pieces of text
+                                        Text(
+                                          '$voltage V',
+                                          style: const TextStyle(
+                                            fontSize: 35,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: EdgeInsets.only(top: 5),
+                                  ),
+                                ),
+                              ),
+                              //Current
+                              Expanded(
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2BB8C9),
+                                    borderRadius: BorderRadius.circular(5), // Set the border radius to make corners rounded
+                                  ),
+                                  child: Padding(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'CURRENT',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white30,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),  // Add some space between the two pieces of text
+                                        Text(
+                                          '$current A',
+                                          style: const TextStyle(
+                                            fontSize: 35,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: EdgeInsets.only(top: 5),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Row(
+                            children: [
+                              //Temperature
+                              Expanded(
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2BB8C9),
+                                    borderRadius: BorderRadius.circular(5), // Set the border radius to make corners rounded
+                                  ),
+                                  child: Padding(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'TEMPERATURE',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white30,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),  // Add some space between the two pieces of text
+                                        Text(
+                                          '$temperature°C',
+                                          style: const TextStyle(
+                                            fontSize: 35,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: EdgeInsets.only(top: 5),
+                                  ),
+                                ),
+                              ),
+                              //mode
+                              Expanded(
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2BB8C9),
+                                    borderRadius: BorderRadius.circular(5), // Set the border radius to make corners rounded
+                                  ),
+                                  child: Padding(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'MODE',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white30,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),  // Add some space between the two pieces of text
+                                        Text(
+                                          '$mode',
+                                          style: const TextStyle(
+                                            fontSize: 35,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: EdgeInsets.only(top: 5),
+                                  )
+
+
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //fifth row with status
+                        Expanded(
+                          child: Container(
+                              margin: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2BB8C9),
+                                borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
+                              ),
+                              child: Center(
+                                  child: Text(
+                                    'Status: $status',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white70,
+                                    ),
+                                  )
+                              )
+                          ),
+                        ),
+                      ],
+                    ),
+                    padding: EdgeInsets.only(left: 10, top: 20, right: 10, bottom: 8),
+                  )
+              )
               //third and fourth rows are for some other iformation like Voltage, Temperature, etc
-              Expanded(
-                flex: 2,
-                child: Row(
-                  children: [
-                    //Voltage
-                    Expanded(
-                      child:
-                      Container(
-                        width: 200,
-                        height: 200,
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2BB8C9),
-                          borderRadius: BorderRadius.circular(
-                              10), // Set the border radius to make corners rounded
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$voltage V',
-                            style: const TextStyle(
-                                fontSize: 50,
-                                color: Colors.white
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    //Current
-                    Expanded(
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2BB8C9),
-                          borderRadius: BorderRadius.circular(
-                              10), // Set the border radius to make corners rounded
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$current A',
-                            style: const TextStyle(
-                                fontSize: 50,
-                                color: Colors.white
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Row(
-                  children: [
-                    //Temperature
-                    Expanded(
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2BB8C9),
-                          borderRadius: BorderRadius.circular(
-                              10), // Set the border radius to make corners rounded
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$temperature° С',
-                            style: const TextStyle(
-                                fontSize: 50,
-                                color: Colors.white
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    //mode
-                    Expanded(
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2BB8C9),
-                          borderRadius: BorderRadius.circular(
-                              10), // Set the border radius to make corners rounded
-                        ),
-                        child: Center(
-                          child: Text(
-                            mode,
-                            style: const TextStyle(
-                                fontSize: 50,
-                                color: Colors.white
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              //fifth row with status
-              Expanded(
-                child: Container(
-                    margin: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2BB8C9),
-                      borderRadius: BorderRadius.circular(10), // Set the border radius to make corners rounded
-                    ),
-                    child: Center(
-                        child: Text(
-                          'Status: $status',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            color: Colors.white70,
-                          ),
-                        )
-                    )
-                ),
-              ),
+
             ],
           ),
         ),
@@ -368,9 +430,64 @@ class _MainScreen extends State<MainScreen> {
     );
   }
 
+  Widget _cellForData(int i){
+
+    String textForCell;
+
+    switch (i){
+      case 0:
+        textForCell = '$voltage V';
+        break;
+      case DATA_ID.CURRENT:
+        textForCell = '$current A';
+        break;
+      case DATA_ID.TEMPERATURE:
+        textForCell = '$temperature°C';
+        break;
+      case DATA_ID.MODE:
+        textForCell = 'SPORT';
+        break;
+      default:
+        textForCell = "zjf";
+        break;
+    }
+
+    return Expanded(
+      child:
+      Container(
+        width: 200,
+        height: 200,
+        margin: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2BB8C9),
+          borderRadius: BorderRadius.circular(5), // Set the border radius to make corners rounded
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'VOLTAGE',
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.white30,
+              ),
+            ),
+            SizedBox(height: 20),  // Add some space between the two pieces of text
+            Text(
+              '$textForCell',
+              style: const TextStyle(
+                fontSize: 35,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void sendPacket() async {
-    Uint8List packet = simpleVESCRequest(COMM_PACKET_ID.COMM_GET_VALUES.index);;
+    Uint8List packet = simpleVESCRequest(COMM_PACKET_ID.COMM_FW_VERSION.index);;
 
     // Request COMM_GET_VALUES_SETUP from the ESC
     if (!await sendBLEData(tx, packet, true)) {
@@ -475,7 +592,7 @@ class _MainScreen extends State<MainScreen> {
       if(list.length == payloadLength + 3){
         //first byte of the list shows which command it is
         switch(list[0]){
-          case 1:
+          case 0:
             workWithFirmWare(list);
             break;
           case 4:
@@ -545,7 +662,7 @@ class _MainScreen extends State<MainScreen> {
             style: const TextStyle(
               color: Color.fromRGBO(0, 79, 99, 100),
               fontWeight: FontWeight.bold,
-              fontSize: 60 * 0.4,
+              fontSize: 55 * 0.4,
             ),
           ),
         ],
