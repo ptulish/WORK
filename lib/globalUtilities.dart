@@ -10,6 +10,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:logger/logger.dart';
 
 import 'Components/crc16.dart';
+import 'classes/singleton.dart';
 import 'dataTypes.dart';
 
 Logger globalLogger = Logger(printer: PrettyPrinter(methodCount: 0), filter: MyFilter());
@@ -39,8 +40,7 @@ Uint8List simpleVESCRequest(int messageIndex, {int? optionalCANID}) {
 }
 
 
-Future<bool> sendBLEData(BluetoothCharacteristic txCharacteristic, Uint8List data, bool withoutResponse) async
-{
+Future<bool> sendBLEData(BluetoothCharacteristic? txCharacteristic, Uint8List data, bool withoutResponse) async {
   int errorLimiter = 30;
   int packetLength = data.length;
   int bytesSent = 0;
@@ -50,7 +50,7 @@ Future<bool> sendBLEData(BluetoothCharacteristic txCharacteristic, Uint8List dat
       endByte = packetLength;
     }
     try {
-      await txCharacteristic.write(
+      await txCharacteristic?.write(
           data.buffer.asUint8List().sublist(bytesSent, endByte),
           withoutResponse: true);
     } on PlatformException catch (err) {
@@ -342,4 +342,126 @@ class ESCFirmware {
   int fw_version_major = 0;
   int fw_version_minor = 0;
   String hardware_name = "hw_name";
+}
+
+void listen() async {
+
+  Singleton.rx?.value.listen((value) {
+    // тут обработка полученных данных
+    print("Received data: $value");
+    //first packet with length of the payload
+    if(Singleton.indexForPacket == 0){
+      firstPacket(value);
+      Singleton.indexForPacket++;
+      return;
+    }
+
+    //fore the next packets we receive we add the value to the list
+    if(Singleton.indexForPacket >= 1){
+      for (var element in value) {
+        Singleton.list.add(element);
+      }
+    }
+
+    // //TODO: crc16 check
+    // int crc = 0;
+    // if(list.length == payloadLength){
+    //   List<int> listForCRC = [...list];
+    //   listForCRC.insert(0, 74);
+    //   listForCRC.insert(0, 2);
+    //
+    //   print("list for crc: ${listForCRC}");
+    //
+    //   Uint8List uintlist = Uint8List.fromList(listForCRC);
+    //   crc = CRC16.crc16(uintlist, 0, uintlist.length);
+    //   print("crc check sum: ${crc}");
+    // }
+
+    //if we have list.length equal payload Length + 3 we work with the packets
+    //+3 because two last numbers are crc check and the last number is 3 which signalise end of message
+    if(Singleton.list.length == Singleton.payloadLength + 3){
+      //first byte of the list shows which command it is
+      switch(Singleton.list[0]){
+        case 0:
+          workWithFirmWare(Singleton.list);
+          break;
+        case 4:
+          workWithTelemetry(Singleton.list);
+          break;
+        case 47:
+          workWithTelemetrySetup(Singleton.list);
+          break;
+        default:
+          print("NEW NOT IMPLEMENTED COMMAND");
+          break;
+      }
+      Singleton.list.clear();
+      Singleton.indexForPacket = 0; Singleton.payloadLength = 0; Singleton.packetLength = 0;
+      return;
+      //TODO: crc16 checksum
+      // print(value);
+      // int checksum = CRC16.crc16(Uint8List.fromList([value[0], value[1]]), 0, value.length - 1);
+      //
+      // print("Checksum: ${checksum}");
+    }
+    Singleton.indexForPacket++;
+  });
+}
+
+void firstPacket(List<int> value) {
+  Singleton.packetLength = value[0];
+  if(Singleton.packetLength == 2){
+    Singleton.payloadLength = value[1];
+  } else if (Singleton.packetLength == 3){
+    Singleton.payloadLength = (value[1] << 8) | value[2];
+  }
+  return;
+}
+
+void workWithFirmWare(List<int> value) {
+  ESCFirmware firmwarePacket = new ESCFirmware();
+
+  Uint8List firmwarePacket1 = Uint8List.fromList(value);
+  firmwarePacket = processFirmware(firmwarePacket1);
+
+  var major = firmwarePacket.fw_version_major;
+  var minor = firmwarePacket.fw_version_minor;
+  var hardName = firmwarePacket.hardware_name;
+  globalLogger.d("Firmware packet: major $major, minor $minor, hardware $hardName");
+  Singleton.firmware = firmwarePacket;
+}
+
+void workWithTelemetrySetup(List<int> value){
+
+  Singleton.telemetryPacket = processSetupValues(Uint8List.fromList(value));
+
+  // Update map of ESC telemetry
+  Singleton.telemetryMap[Singleton.telemetryPacket.vesc_id] = Singleton.telemetryPacket;
+
+}
+
+void workWithTelemetry(List<int> value) {
+  Singleton.telemetryPacket = processTelemetry(Uint8List.fromList(value));
+
+  // Update map of ESC telemetry
+  Singleton.telemetryMap[Singleton.telemetryPacket.vesc_id] = Singleton.telemetryPacket;
+
+  Singleton.telemetryStream.listen((data) {
+    print('Data received: $data');
+  });
+
+
+}
+
+void sendPacket(int command) async {
+  Uint8List packet = simpleVESCRequest(command);
+
+  // Request COMM_GET_VALUES_SETUP from the ESC
+  if (!await sendBLEData(Singleton.tx, packet, true)) {
+    globalLogger.e("_requestTelemetry() failed");
+  } else {
+    print("Hello this is sendBLEData");
+  }
+
+  print("after rx tx");
 }
