@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import '../components/crc16.dart';
 import '../globalUtilities.dart';
 import 'dart:typed_data';
@@ -6,9 +8,9 @@ class BLEHelper {
   int counter = 0;
   int endMessage = 512;
   bool messageRead = false;
-  static Uint8List messageReceived = new Uint8List(512);
+  static Uint8List messageReceived = Uint8List(512);
   int lenPayload = 0;
-  static Uint8List payload = new Uint8List(512);
+  static Uint8List payload = Uint8List(512);
   int payloadStart = 0;
 
   Uint8List getMessage()
@@ -63,7 +65,7 @@ class BLEHelper {
 
   int processIncomingBytes(List<int> incomingData) {
 
-    Uint8List bytes = new Uint8List.fromList(incomingData);
+    Uint8List bytes = Uint8List.fromList(incomingData);
     //globalLogger.d("Processing incoming bytes $bytes");
 
     for (int i = 0; i < bytes.length; ++i) {
@@ -78,7 +80,7 @@ class BLEHelper {
             //globalLogger.d("message(short) lenPayload is $lenPayload, endMessage is $endMessage");
             break;
           case 3: ///3 is the start of a packet that is >255 bytes in length
-            var byteData = new ByteData.view(bytes.buffer);
+            var byteData = ByteData.view(bytes.buffer);
             lenPayload = byteData.getInt16(1);
             endMessage = lenPayload + 6; //+5 = <start><lenPayload><lenPayload2><payload><crc><crc><end>
             payloadStart = 3;

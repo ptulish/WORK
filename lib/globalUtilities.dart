@@ -56,7 +56,8 @@ Future<bool> sendBLEData(BluetoothCharacteristic txCharacteristic, Uint8List dat
     } on PlatformException catch (err) {
       //TODO: Assuming err.code will always be "write_characteristic_error"
       if (--errorLimiter == 0) {
-        globalLogger.e("sendBLEData: Write to characteristic exhausted all attempts. Data not sent. ${txCharacteristic.toString()}");
+        globalLogger.e("sendBLEData: Write to characteristic exhausted all attempts. Data not sent. ${txCharacteristic.toString()}"
+            "Error: $err");
         return Future.value(false);
       } else {
         //TODO: Observed "write_characteristic_error, no instance of BluetoothGatt, have you connected first?" (believed to be resolved)

@@ -1,6 +1,8 @@
 
 
 
+// ignore_for_file: file_names
+
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class ConnectedDevice {

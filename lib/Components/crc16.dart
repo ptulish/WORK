@@ -31,10 +31,10 @@ class CRC16 {
     0x0cc1, 0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0];
 
-  static final Uint16List crc16Table = new Uint16List.fromList(dartCRCList);
+  static final Uint16List crc16Table = Uint16List.fromList(dartCRCList);
 
   static int crc16(Uint8List buffer, int index, int length) {
-    Uint16List checksum = new Uint16List(1);
+    Uint16List checksum = Uint16List(1);
     for (int i=0; i<length; ++i) {
       checksum[0] = crc16Table[(((checksum[0] >> 8) ^ buffer[index++]) & 0xFF)] ^ (checksum[0] << 8);
     }
