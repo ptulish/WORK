@@ -23,11 +23,9 @@ class _ScanState extends State<Scan> {
   BluetoothDevice? device;
   bool isConnected = false;
 
-
   String? deviceAddress;
   late BluetoothService targetService;
-  static ESCFirmware firmwarePacket = new ESCFirmware();
-  BLEHelper bleHelper = new BLEHelper();
+  BLEHelper bleHelper = BLEHelper();
   int index = 0;
   int payloadLength = 0;
   int packetLength = 0;
@@ -58,8 +56,13 @@ class _ScanState extends State<Scan> {
             backgroundColor: Color.fromRGBO(0, 114, 143, 80),
             body: Center(
               child: Text(
-                'Loading...',
-              ),
+                'Welcome to Sylents',
+                style: TextStyle(
+                  fontFamily: 'VT323',
+                  fontSize: 35,
+                  color: Colors.white54,
+                ),
+              )
             ),
           ); // показывает индикатор загрузки
         } else {
@@ -164,10 +167,14 @@ class _ScanState extends State<Scan> {
                                         alignment: Alignment.centerRight,
                                         child: OutlinedButton(
                                           onPressed: () async {
+
+                                            Navigator.of(context).push(LoadingOverlay()); // Отображаем индикатор загрузки
+
                                             await connectDevice(listOfDevices.elementAt(index));
                                             getServicesAndFirmware();
                                             Future.delayed(const Duration(seconds: 2), () {
                                               // Здесь может быть ваш код, который будет выполнен после задержки.
+                                              Navigator.of(context).pop(); // Убираем индикатор загрузки
                                               showDialog<void>(
                                                 context: context,
                                                 builder: (BuildContext context) {
@@ -179,7 +186,7 @@ class _ScanState extends State<Scan> {
                                                         'Firmware: ${Singleton.firmware?.hardware_name}\n'),
                                                     actions: <Widget>[
                                                       TextButton(
-                                                        child: Text('ОК'),
+                                                        child: const Text('ОК'),
                                                         onPressed: () {
                                                           // Здесь ваша функция перехода на новый экран
                                                           Navigator.push(
@@ -199,7 +206,7 @@ class _ScanState extends State<Scan> {
                                               borderRadius: BorderRadius.circular(10), // установите значение радиуса по своему усмотрению
                                             ),
                                           ),
-                                          child: Text('Connect'),
+                                          child: const Text('Connect'),
                                         )
                                       ),
                                     ),
@@ -221,16 +228,19 @@ class _ScanState extends State<Scan> {
     );
   }
 
+
   Widget showDialog1(){
     return AlertDialog(
-      title: Text('Всплывающее окно'),
-      content: Text('Здесь может быть ваше сообщение.'),
+      title: const Text('Всплывающее окно'),
+      content: const Text('Здесь может быть ваше сообщение.'),
       actions: <Widget>[
         TextButton(
-          child: Text('ОК'),
+          child: const Text('ОК'),
           onPressed: () {
             // Здесь можно добавить вашу функцию
-            print('Вы нажали на кнопку ОК!');
+            if (kDebugMode) {
+              print('Вы нажали на кнопку ОК!');
+            }
             Navigator.of(context).pop(); // Эта строка закрывает всплывающее окно
           },
         ),
@@ -358,10 +368,72 @@ class _ScanState extends State<Scan> {
         await Singleton.rx?.setNotifyValue(true);
       }
     } catch (e) {
-      print("Failed to setup notifications: $e");
+      if (kDebugMode) {
+        print("Failed to setup notifications: $e");
+      }
     }
     listen();
     sendPacket(COMM_PACKET_ID.COMM_FW_VERSION.index);
   }
 
+  void showLoading(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Предотвратить закрытие диалога нажатием вне его
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Color.fromARGB(230, 230, 230, 100),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              // new Text("Loading"),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+}
+
+class LoadingOverlay extends ModalRoute<void> {
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 500);
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get barrierDismissible => false;
+
+  @override
+  Color get barrierColor => Colors.black.withOpacity(0.5);
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Widget buildPage(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      ) {
+    return Material(
+      type: MaterialType.transparency,
+      child: SafeArea(
+        child: _buildOverlayContent(context),
+      ),
+    );
+  }
+
+  Widget _buildOverlayContent(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
 }
