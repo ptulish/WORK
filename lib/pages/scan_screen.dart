@@ -30,6 +30,8 @@ class _ScanState extends State<Scan> {
   int payloadLength = 0;
   int packetLength = 0;
   List<int> list = [];
+  int ind = 0;
+
 
   @override
   void initState() {
@@ -38,12 +40,166 @@ class _ScanState extends State<Scan> {
     }
     super.initState();
     bluetoothCheck();
-    findDevices();
   }
 
   Future<String> _loadData() async {
-    await Future.delayed(const Duration(seconds: 3)); // Имитация долгой загрузки данных
-    return 'Loaded Data'; // Здесь должны быть ваши загруженные данные
+    findDevices();
+    await Future.delayed(const Duration(seconds: 2)); // Имитация долгой загрузки данных
+    return 'OK'; // Здесь должны быть ваши загруженные данные
+  }
+
+  Widget loadingScreen(int i){
+    if(i <= 1){
+      return const Scaffold(
+        backgroundColor: Color.fromRGBO(0, 114, 143, 80),
+        body: Center(
+            child: Text(
+              'Welcome to Sylents',
+              style: TextStyle(
+                fontFamily: 'VT323',
+                fontSize: 35,
+                color: Colors.white54,
+              ),
+            )
+        ),
+      );// показывает индикатор загрузки
+    } else {
+      return const Scaffold(
+        backgroundColor: Color.fromRGBO(0, 114, 143, 80),
+        body: Center(
+            child: Text(
+              'Loading...',
+              style: TextStyle(
+                fontFamily: 'VT323',
+                fontSize: 35,
+                color: Colors.white54,
+              ),
+            )
+        ),
+      );// показывает индикатор загрузки
+    }
+  }
+
+
+  Widget headindPlusButton() {
+    return Expanded(
+      flex: 10,
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children:[
+            const Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text(
+                'Devices',
+                style: TextStyle(
+                    fontSize: 40,
+                    color: Color.fromRGBO(230, 230, 230, 100),
+                    fontWeight: FontWeight.w500
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 30),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    if(isConnected == true){
+                      device?.disconnect();
+                    }
+                    findDevices();
+
+                  });
+                },
+                style:  ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // установите значение радиуса по своему усмотрению
+                  ),
+                ),
+                child: const Text(
+                  'Scan',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            )
+          ]
+      ),
+    );
+  }
+
+  Widget devicesList() {
+    return Expanded(
+      flex: 75,
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 0),
+        itemCount: listOfDevices.length, // Anzahl der Elemente in der Liste
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              ListTile(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(listOfDevices.elementAt(index)),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Align(
+                          alignment: Alignment.centerRight,
+                          child: OutlinedButton(
+                            onPressed: () async {
+
+                              Navigator.of(context).push(LoadingOverlay()); // Отображаем индикатор загрузки
+
+                              await connectDevice(listOfDevices.elementAt(index));
+                              getServicesAndFirmware();
+                              Future.delayed(const Duration(seconds: 2), () {
+                                // Здесь может быть ваш код, который будет выполнен после задержки.
+                                Navigator.of(context).pop(); // Убираем индикатор загрузки
+                                showDialog<void>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Connect to ${device?.name}'),
+                                      content: Text('FIRMWARE:\n'
+                                          'Major: ${Singleton.firmware?.fw_version_major}\n'
+                                          'Minor: ${Singleton.firmware?.fw_version_minor}\n'
+                                          'Firmware: ${Singleton.firmware?.hardware_name}\n'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('ОК'),
+                                          onPressed: () {
+                                            // Здесь ваша функция перехода на новый экран
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => MainScreen(device: device)),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10), // установите значение радиуса по своему усмотрению
+                              ),
+                            ),
+                            child: const Text('Connect'),
+                          )
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -51,20 +207,12 @@ class _ScanState extends State<Scan> {
     return FutureBuilder<String>(
       future: _loadData(), // функция, которую нужно выполнить
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Color.fromRGBO(0, 114, 143, 80),
-            body: Center(
-              child: Text(
-                'Welcome to Sylents',
-                style: TextStyle(
-                  fontFamily: 'VT323',
-                  fontSize: 35,
-                  color: Colors.white54,
-                ),
-              )
-            ),
-          ); // показывает индикатор загрузки
+        if (snapshot.connectionState == ConnectionState.waiting && ind == 0) {
+          ind++;
+          return loadingScreen(ind);
+        } else if (snapshot.connectionState == ConnectionState.waiting && ind > 0) {
+          ind++;
+          return loadingScreen(ind);
         } else {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -77,68 +225,9 @@ class _ScanState extends State<Scan> {
                 child: Column(
                   children: [
                     //logo as top-bar
-                    Expanded(
-                      flex: 15,
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: FractionallySizedBox(
-                          widthFactor: 0.19, // Adjust this value as needed
-                          heightFactor: 0.5, // Adjust this value as needed
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: Image.asset(
-                              'assets/logo.png',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    logo(),
                     //Devices heading
-                    Expanded(
-                      flex: 10,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:[
-                            const Padding(
-                              padding: EdgeInsets.only(left: 15),
-                              child: Text(
-                                'Devices',
-                                style: TextStyle(
-                                    fontSize: 40,
-                                    color: Color.fromRGBO(230, 230, 230, 100),
-                                    fontWeight: FontWeight.w500
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 30),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if(isConnected == true){
-                                      device?.disconnect();
-                                    }
-                                    findDevices();
-
-                                  });
-                                },
-                                style:  ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.only(left: 20, right: 20),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10), // установите значение радиуса по своему усмотрению
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Scan',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ]
-                      ),
-                    ),
+                    headindPlusButton(),
                     // Line under dem ersten Raster-Row
                     Container(
                       margin: const EdgeInsets.only(left: 15, right: 30),
@@ -148,76 +237,7 @@ class _ScanState extends State<Scan> {
                         borderRadius: BorderRadius.circular(5), // Adjust the radius as needed
                       ),
                     ),
-                    Expanded(
-                      flex: 75,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(top: 0),
-                        itemCount: listOfDevices.length, // Anzahl der Elemente in der Liste
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              ListTile(
-                                title: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(listOfDevices.elementAt(index)),
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 15),
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: OutlinedButton(
-                                          onPressed: () async {
-
-                                            Navigator.of(context).push(LoadingOverlay()); // Отображаем индикатор загрузки
-
-                                            await connectDevice(listOfDevices.elementAt(index));
-                                            getServicesAndFirmware();
-                                            Future.delayed(const Duration(seconds: 2), () {
-                                              // Здесь может быть ваш код, который будет выполнен после задержки.
-                                              Navigator.of(context).pop(); // Убираем индикатор загрузки
-                                              showDialog<void>(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: Text('Connect to ${device?.name}'),
-                                                    content: Text('FIRMWARE:\n'
-                                                        'Major: ${Singleton.firmware?.fw_version_major}\n'
-                                                        'Minor: ${Singleton.firmware?.fw_version_minor}\n'
-                                                        'Firmware: ${Singleton.firmware?.hardware_name}\n'),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        child: const Text('ОК'),
-                                                        onPressed: () {
-                                                          // Здесь ваша функция перехода на новый экран
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(builder: (context) => MainScreen(device: device)),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            });
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10), // установите значение радиуса по своему усмотрению
-                                            ),
-                                          ),
-                                          child: const Text('Connect'),
-                                        )
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+                    devicesList(),
                   ],
                 ),
               ),
@@ -231,16 +251,12 @@ class _ScanState extends State<Scan> {
 
   Widget showDialog1(){
     return AlertDialog(
-      title: const Text('Всплывающее окно'),
-      content: const Text('Здесь может быть ваше сообщение.'),
+      title: const Text('Bluetooth'),
+      content: const Text('There is some problem with Bluetooth.'),
       actions: <Widget>[
         TextButton(
           child: const Text('ОК'),
           onPressed: () {
-            // Здесь можно добавить вашу функцию
-            if (kDebugMode) {
-              print('Вы нажали на кнопку ОК!');
-            }
             Navigator.of(context).pop(); // Эта строка закрывает всплывающее окно
           },
         ),
@@ -338,11 +354,6 @@ class _ScanState extends State<Scan> {
       }
       return;
     }
-
-    // if (kDebugMode) {
-    //   print("is available: $isBluetoothAvailable is on: $isBluetoothEnabled");
-    // }
-
   }
 
   void getServicesAndFirmware() async {
@@ -394,6 +405,7 @@ class _ScanState extends State<Scan> {
       },
     );
   }
+
 
 
 }

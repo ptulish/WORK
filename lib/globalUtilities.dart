@@ -5,6 +5,8 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:logger/logger.dart';
@@ -164,7 +166,7 @@ class ESCTelemetry {
 
 ESCTelemetry processSetupValues(Uint8List payload) {
   int index = 1;
-  ESCTelemetry telemetryPacket = new ESCTelemetry();
+  ESCTelemetry telemetryPacket = ESCTelemetry();
 
   telemetryPacket.temp_mos = buffer_get_float16(payload, index, 10.0); index += 2;
   telemetryPacket.temp_motor = buffer_get_float16(payload, index, 10.0); index += 2;
@@ -193,9 +195,8 @@ ESCTelemetry processSetupValues(Uint8List payload) {
 
 ESCTelemetry processTelemetry(Uint8List payload) {
   int index = 1;
-  ESCTelemetry telemetryPacket = new ESCTelemetry();
+  ESCTelemetry telemetryPacket = ESCTelemetry();
 
-  print("PAyload: ${payload}");
   telemetryPacket.temp_mos = buffer_get_float16(payload, index, 10.0); index += 2;
   telemetryPacket.temp_motor = buffer_get_float16(payload, index, 10.0); index += 2;
   telemetryPacket.current_motor = buffer_get_float32(payload, index, 100.0); index += 4;
@@ -220,61 +221,60 @@ ESCTelemetry processTelemetry(Uint8List payload) {
   telemetryPacket.vd = buffer_get_float32(payload, index, 100.0); index += 4;
   telemetryPacket.vq = buffer_get_float32(payload, index, 100.0);
 
-  print("temp_mos: ${telemetryPacket.temp_mos}\n"
-      "temp_motor ${telemetryPacket.temp_motor}\n"
-      "current_motor: ${telemetryPacket.current_motor}\n"
-      "current_in: ${telemetryPacket.current_in}\n"
-      "foc_id: ${telemetryPacket.foc_id}\n"
-      "foc_iq: ${telemetryPacket.foc_iq}\n"
-      "duty_now: ${telemetryPacket.duty_now}\n"
-      "rpm: ${telemetryPacket.rpm}\n"
-      // "speed: ${telemetryPacket.speed}"
-      "v_in: ${telemetryPacket.v_in}\n"
-      // "battery_level: ${telemetryPacket.battery_level}"
-      "amp_hours: ${telemetryPacket.amp_hours}\n"
-      "amp_hours_charged: ${telemetryPacket.amp_hours_charged}\n"
-      "watt_hours: ${telemetryPacket.watt_hours}\n"
-      "watt_hours_charged: ${telemetryPacket.watt_hours_charged}\n"
-      "tachometer: ${telemetryPacket.tachometer}\n"
-      "tachometer_abs: ${telemetryPacket.tachometer_abs}\n"
-      "position: ${telemetryPacket.position}\n"
-      "fault_code: ${telemetryPacket.fault_code}\n"
-      "vesc_id: ${telemetryPacket.vesc_id}\n"
-      "num_vescs: ${telemetryPacket.num_vescs}\n"
-      "battery_wh: ${telemetryPacket.battery_wh}\n"
-      "vd: ${telemetryPacket.vd}\n"
-      "vq: ${telemetryPacket.vq}\n"
-      "temp_mos1: ${telemetryPacket.temp_mos_1}\n"
-      "temp_mos2: ${telemetryPacket.temp_mos_2}\n"
-      "temp_mos3: ${telemetryPacket.temp_mos_3}\n"
-  );
-
-  print("index: $index, payload: ${payload.length}");
-
+  // if (kDebugMode) {
+  //   print("temp_mos: ${telemetryPacket.temp_mos}\n"
+  //     "temp_motor ${telemetryPacket.temp_motor}\n"
+  //     "current_motor: ${telemetryPacket.current_motor}\n"
+  //     "current_in: ${telemetryPacket.current_in}\n"
+  //     "foc_id: ${telemetryPacket.foc_id}\n"
+  //     "foc_iq: ${telemetryPacket.foc_iq}\n"
+  //     "duty_now: ${telemetryPacket.duty_now}\n"
+  //     "rpm: ${telemetryPacket.rpm}\n"
+  //     // "speed: ${telemetryPacket.speed}"
+  //     "v_in: ${telemetryPacket.v_in}\n"
+  //     // "battery_level: ${telemetryPacket.battery_level}"
+  //     "amp_hours: ${telemetryPacket.amp_hours}\n"
+  //     "amp_hours_charged: ${telemetryPacket.amp_hours_charged}\n"
+  //     "watt_hours: ${telemetryPacket.watt_hours}\n"
+  //     "watt_hours_charged: ${telemetryPacket.watt_hours_charged}\n"
+  //     "tachometer: ${telemetryPacket.tachometer}\n"
+  //     "tachometer_abs: ${telemetryPacket.tachometer_abs}\n"
+  //     "position: ${telemetryPacket.position}\n"
+  //     "fault_code: ${telemetryPacket.fault_code}\n"
+  //     "vesc_id: ${telemetryPacket.vesc_id}\n"
+  //     "num_vescs: ${telemetryPacket.num_vescs}\n"
+  //     "battery_wh: ${telemetryPacket.battery_wh}\n"
+  //     "vd: ${telemetryPacket.vd}\n"
+  //     "vq: ${telemetryPacket.vq}\n"
+  //     "temp_mos1: ${telemetryPacket.temp_mos_1}\n"
+  //     "temp_mos2: ${telemetryPacket.temp_mos_2}\n"
+  //     "temp_mos3: ${telemetryPacket.temp_mos_3}\n"
+  // );
+  // }
   return telemetryPacket;
 }
 int buffer_get_int16(Uint8List buffer, int index) {
-  var byteData = new ByteData.view(buffer.buffer);
+  var byteData = ByteData.view(buffer.buffer);
   return byteData.getInt16(index);
 }
 
 int buffer_get_uint16(Uint8List buffer, int index) {
-  var byteData = new ByteData.view(buffer.buffer);
+  var byteData = ByteData.view(buffer.buffer);
   return byteData.getUint16(index);
 }
 
 int buffer_get_int32(Uint8List buffer, int index) {
-  var byteData = new ByteData.view(buffer.buffer);
+  var byteData = ByteData.view(buffer.buffer);
   return byteData.getInt32(index);
 }
 
 int buffer_get_uint32(Uint8List buffer, int index) {
-  var byteData = new ByteData.view(buffer.buffer);
+  var byteData = ByteData.view(buffer.buffer);
   return byteData.getUint32(index);
 }
 
 int buffer_get_uint64(Uint8List buffer, int index, [Endian endian = Endian.big]) {
-  var byteData = new ByteData.view(buffer.buffer);
+  var byteData = ByteData.view(buffer.buffer);
   return byteData.getUint64(index, endian);
 }
 
@@ -287,18 +287,18 @@ double buffer_get_float32(Uint8List buffer, int index, double scale) {
 }
 
 double buffer_get_float32_auto(Uint8List buffer, int index) {
-  Uint32List res = new Uint32List(1);
+  Uint32List res = Uint32List(1);
   res[0] = buffer_get_uint32(buffer, index);
 
   int e = (res[0] >> 23) & 0xFF;
-  Uint32List sig_i = new Uint32List(1);
-  sig_i[0] = res[0] & 0x7FFFFF;
-  int neg_i = res[0] & (1 << 31);
-  bool neg = neg_i > 0 ? true : false;
+  Uint32List sigI = Uint32List(1);
+  sigI[0] = res[0] & 0x7FFFFF;
+  int negI = res[0] & (1 << 31);
+  bool neg = negI > 0 ? true : false;
 
   double sig = 0.0;
-  if (e != 0 || sig_i[0] != 0) {
-    sig = sig_i[0].toDouble() / (8388608.0 * 2.0) + 0.5;
+  if (e != 0 || sigI[0] != 0) {
+    sig = sigI[0].toDouble() / (8388608.0 * 2.0) + 0.5;
     e -= 126;
   }
 
@@ -321,7 +321,9 @@ ESCFirmware processFirmware(Uint8List payload) {
   ESCFirmware firmwarePacket = new ESCFirmware();
   firmwarePacket.fw_version_major = payload[index++];
   firmwarePacket.fw_version_minor = payload[index++];
-  print("POCKET ID : $id");
+  // if (kDebugMode) {
+  //   print("POCKET ID : $id");
+  // }
 
   Uint8List hardwareBytes = new Uint8List(30);
   int i = 0;
@@ -348,7 +350,9 @@ void listen() async {
 
   Singleton.rx?.value.listen((value) {
     // тут обработка полученных данных
-    print("Received data: $value");
+    // if (kDebugMode) {
+    //   print("Received data: $value");
+    // }
     //first packet with length of the payload
     if(Singleton.indexForPacket == 0){
       firstPacket(value);
@@ -446,11 +450,6 @@ void workWithTelemetry(List<int> value) {
   // Update map of ESC telemetry
   Singleton.telemetryMap[Singleton.telemetryPacket.vesc_id] = Singleton.telemetryPacket;
 
-  Singleton.telemetryStream.listen((data) {
-    print('Data received: $data');
-  });
-
-
 }
 
 void sendPacket(int command) async {
@@ -460,8 +459,28 @@ void sendPacket(int command) async {
   if (!await sendBLEData(Singleton.tx, packet, true)) {
     globalLogger.e("_requestTelemetry() failed");
   } else {
-    print("Hello this is sendBLEData");
+    //print("Hello this is sendBLEData");
   }
 
-  print("after rx tx");
+  //print("after rx tx");
 }
+
+Widget logo(){
+  return Expanded(
+    flex: 15,
+    child: Align(
+      alignment: Alignment.topLeft,
+      child: FractionallySizedBox(
+        widthFactor: 0.19, // Adjust this value as needed
+        heightFactor: 0.5, // Adjust this value as needed
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Image.asset(
+            'assets/images/logo1.png',
+          ),
+        ),
+      ),
+    ),
+  );
+}
+

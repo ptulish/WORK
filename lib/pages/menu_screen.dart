@@ -19,7 +19,7 @@ class MenuScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Image(
-                      image: AssetImage('assets/logo1.png'), width: 50, height: 50,
+                      image: AssetImage('assets/images/logo1.png'), width: 50, height: 50,
                     ),
                     Text(
                       "SyDev1",
