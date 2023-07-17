@@ -80,7 +80,6 @@ class _ScanState extends State<Scan> {
     }
   }
 
-
   Widget headindPlusButton() {
     return Expanded(
       flex: 10,
@@ -165,7 +164,7 @@ class _ScanState extends State<Scan> {
                                       content: Text('FIRMWARE:\n'
                                           'Major: ${Singleton.firmware?.fw_version_major}\n'
                                           'Minor: ${Singleton.firmware?.fw_version_minor}\n'
-                                          'Firmware: ${Singleton.firmware?.hardware_name}\n'),
+                                          'Hardware: ${Singleton.firmware?.hardware_name}\n'),
                                       actions: <Widget>[
                                         TextButton(
                                           child: const Text('ОК'),

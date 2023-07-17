@@ -23,6 +23,11 @@ class Singleton{
   static ESCFirmware? firmware;
   static ESCTelemetry telemetryPacket = new ESCTelemetry();
 
+  static String topRight = 'current';
+  static String topLeft = 'power';
+  static String bottomRight = 'temperature';
+  static String bottomLeft = 'voltage';
+
   static final StreamController<Map<int, ESCTelemetry>> _mapController = StreamController.broadcast();
 
   static Map<int, ESCTelemetry> _telemetryMap = {};
