@@ -68,7 +68,7 @@ class _ScanState extends State<Scan> {
         backgroundColor: Color.fromRGBO(0, 114, 143, 80),
         body: Center(
             child: Text(
-              'Loading...',
+              'Scanning...',
               style: TextStyle(
                 fontFamily: 'VT323',
                 fontSize: 35,
