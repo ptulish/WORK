@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:workproject/globalUtilities.dart';
 
 class Singleton{
@@ -13,6 +14,8 @@ class Singleton{
     return _singleton;
   }
 
+
+  static StreamSubscription<Position>? positionStreamSubscription;
   static BluetoothCharacteristic? rx;
   static BluetoothCharacteristic? tx;
   static BluetoothService? uartService;

@@ -2,6 +2,8 @@
 
 
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -14,6 +16,7 @@ import 'package:logger/logger.dart';
 import 'Components/crc16.dart';
 import 'classes/singleton.dart';
 import 'dataTypes.dart';
+import 'dart:collection';
 
 Logger globalLogger = Logger(printer: PrettyPrinter(methodCount: 0), filter: MyFilter());
 
@@ -26,7 +29,7 @@ class MyFilter extends LogFilter {
 
 Uint8List simpleVESCRequest(int messageIndex, {int? optionalCANID}) {
   bool sendCAN = optionalCANID != null;
-  var byteData = new ByteData(sendCAN ? 8:6); //<start><payloadLen><packetID><crc1><crc2><end>
+  var byteData = ByteData(sendCAN ? 8:6); //<start><payloadLen><packetID><crc1><crc2><end>
   byteData.setUint8(0, 0x02);
   byteData.setUint8(1, sendCAN ? 0x03 : 0x01); // Data length
   if (sendCAN) {
@@ -316,21 +319,20 @@ double ldexpf(double arg, int exp) {
 }
 
 ESCFirmware processFirmware(Uint8List payload) {
-  int id = payload[0];
   int index = 1;
-  ESCFirmware firmwarePacket = new ESCFirmware();
+  ESCFirmware firmwarePacket = ESCFirmware();
   firmwarePacket.fw_version_major = payload[index++];
   firmwarePacket.fw_version_minor = payload[index++];
   // if (kDebugMode) {
   //   print("POCKET ID : $id");
   // }
 
-  Uint8List hardwareBytes = new Uint8List(30);
+  Uint8List hardwareBytes = Uint8List(30);
   int i = 0;
   while (payload[index] != 0) {
     hardwareBytes[i++] = payload[index++];
   }
-  firmwarePacket.hardware_name = new String.fromCharCodes(hardwareBytes);
+  firmwarePacket.hardware_name = String.fromCharCodes(hardwareBytes);
 
   return firmwarePacket;
 }
@@ -396,7 +398,9 @@ void listen() async {
           workWithTelemetrySetup(Singleton.list);
           break;
         default:
-          print("NEW NOT IMPLEMENTED COMMAND");
+          if (kDebugMode) {
+            print("NEW NOT IMPLEMENTED COMMAND");
+          }
           break;
       }
       Singleton.list.clear();
@@ -423,7 +427,7 @@ void firstPacket(List<int> value) {
 }
 
 void workWithFirmWare(List<int> value) {
-  ESCFirmware firmwarePacket = new ESCFirmware();
+  ESCFirmware firmwarePacket = ESCFirmware();
 
   Uint8List firmwarePacket1 = Uint8List.fromList(value);
   firmwarePacket = processFirmware(firmwarePacket1);
@@ -484,3 +488,23 @@ Widget logo(){
   );
 }
 
+
+class SpeedFilter {
+  final int size;
+  final Queue<double> speedQueue;
+  double threshold;
+
+  SpeedFilter({required this.size, this.threshold = 1.0})
+      : speedQueue = Queue<double>();
+
+  double filter(double speed) {
+    if (speedQueue.length == size) {
+      speedQueue.removeFirst();
+    }
+    speedQueue.add(speed);
+
+    double averageSpeed =
+        speedQueue.reduce((a, b) => a + b) / speedQueue.length;
+    return averageSpeed >= threshold ? averageSpeed : 0;
+  }
+}

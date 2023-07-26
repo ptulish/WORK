@@ -93,12 +93,13 @@ class _ScanState extends State<Scan> {
                 style: TextStyle(
                     fontSize: 40,
                     color: Color.fromRGBO(230, 230, 230, 100),
+                    letterSpacing: 8,
                     fontWeight: FontWeight.w500
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 30),
+              padding: const EdgeInsets.only(right: 30, top: 8),
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
@@ -110,6 +111,7 @@ class _ScanState extends State<Scan> {
                   });
                 },
                 style:  ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(230, 230, 230, 100),
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10), // установите значение радиуса по своему усмотрению
