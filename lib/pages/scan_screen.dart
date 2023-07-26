@@ -68,7 +68,7 @@ class _ScanState extends State<Scan> {
         backgroundColor: Color.fromRGBO(0, 114, 143, 80),
         body: Center(
             child: Text(
-              'Loading...',
+              'Scanning...',
               style: TextStyle(
                 fontFamily: 'VT323',
                 fontSize: 35,
@@ -268,9 +268,9 @@ class _ScanState extends State<Scan> {
   late ScanResult result;
 
   void findDevices() async {
-    // Используйте Set для автоматической фильтрации дубликатов
     Set<String> deviceSet = {};
-    if(isConnected == true){
+
+    if (isConnected == true) {
       device?.disconnect();
     }
 
@@ -279,20 +279,31 @@ class _ScanState extends State<Scan> {
     var scanSubscription = flutterBlue.scanResults.listen((results) async {
       for (ScanResult result in results) {
         String deviceName = result.device.name;
-        // print(result.device.name);
 
         if (deviceName.startsWith("SY2")) {
-          // Просто добавьте имя устройства в Set
           deviceSet.add(deviceName);
         }
       }
+
+      // Add the standard device "SYDBG" if it's not already present
+      if (!deviceSet.contains("SYDBG")) {
+        deviceSet.add("SYDBG");
+      }
+
       listOfDevices = deviceSet.toList();
+      listOfDevices.sort(); // Sort the devices alphabetically
+
+      // Move the "SYDBG" device to the last position
+      if (listOfDevices.remove("SYDBG")) {
+        listOfDevices.add("SYDBG");
+      }
     });
 
     if (kDebugMode) {
       print(scanSubscription);
     }
   }
+
 
   Future<void> connectDevice(String deviceNameToConnect) async {
     // Start scanning
