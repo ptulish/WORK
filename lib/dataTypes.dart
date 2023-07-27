@@ -1,12 +1,5 @@
 // ignore_for_file: file_names, camel_case_types, constant_identifier_names
 
-enum DATA_ID {
-  VOLTAGE,
-  CURRENT,
-  TEMPERATURE,
-  MODE,
-
-}
 
 enum COMM_PACKET_ID {
   COMM_FW_VERSION,

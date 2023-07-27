@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../classes/singleton.dart';
 
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
+  @override
+  State<MenuScreen> createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,82 +86,6 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  // void _showBottomSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //       context: context,
-  //       builder: (context) {
-  //         return ListView.builder(
-  //           itemCount: 4,
-  //           itemBuilder: (context, index) {
-  //             return DropdownButton<String>(
-  //               items: <String>["Power", "Current"]
-  //                   .map<DropdownMenuItem<String>>((String value) {
-  //                 return DropdownMenuItem<String>(
-  //                   value: value,
-  //                   child: Text(value),
-  //                 );
-  //               }).toList(),
-  //               onChanged: (String? newValue) {
-  //                 // Здесь ваша функция, которая выполняется при выборе опции
-  //                 print('User selected $newValue');
-  //               },
-  //               hint: Text('руддщ'),
-  //             );
-  //           },
-  //         );
-  //       });
-  // }
-  // void _showBottomSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //       context: context,
-  //       builder: (context) {
-  //         return ListView.builder(
-  //           itemCount: items.length,
-  //           itemBuilder: (context, index) {
-  //             return
-  //               Expanded(
-  //                 child: Column(
-  //                 children: [
-  //                   Text(items[index].title), // Вывод названия элемента
-  //                   DropdownButton<String>(
-  //                     items: items[index].options.map<DropdownMenuItem<String>>((String value) {
-  //                       return DropdownMenuItem<String>(
-  //                         value: value,
-  //                         child: Text(value),
-  //                       );
-  //                     }).toList(),
-  //                     onChanged: (String? newValue) {
-  //                       // Здесь ваша функция, которая выполняется при выборе опции
-  //
-  //
-  //                       switch (index){
-  //                         case 0:
-  //                           Singleton.topLeft = newValue!;
-  //                           break;
-  //                         case 1:
-  //                           Singleton.topRight = newValue!;
-  //                           break;
-  //                         case 2:
-  //                           Singleton.bottomLeft = newValue!;
-  //                           break;
-  //                         case 3:
-  //                           Singleton.bottomRight = newValue!;
-  //                           break;
-  //                         default:
-  //                           break;
-  //                       }
-  //                       print('User selected $newValue, $index');
-  //                     },
-  //                     hint: Text('Выберите опцию'),
-  //                   ),
-  //                 ],
-  //               ),
-  //               );
-  //           },
-  //         );
-  //       }
-  //   );
-  // }
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -164,66 +93,68 @@ class MenuScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
-              return Padding(
-                padding: EdgeInsets.all(8.0),  // Добавьте нужные вам отступы
-                child: Column(
-                  children: [
-
-                    Text(items[index].title), // Вывод названия элемента
-                    DropdownButton<String>(
-                      items: items[index].options.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        // Здесь ваша функция, которая выполняется при выборе опции
-                        switch (index){
-                          case 0:
-                            Singleton.topLeft = newValue!;
-                            break;
-                          case 1:
-                            Singleton.topRight = newValue!;
-                            break;
-                          case 2:
-                            Singleton.bottomLeft = newValue!;
-                            break;
-                          case 3:
-                            Singleton.bottomRight = newValue!;
-                            break;
-                          default:
-                            break;
-                        }
-                        print('User selected $newValue, $index');
-                      },
-                      hint: Text('Выберите опцию'),
-                    ),
-                  ],
-                ),
+              return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Text(items[index].title),
+                          DropdownButton<String>(
+                            items: items[index].options.map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              // Here your function, which runs when selecting an option
+                              switch (index){
+                                case 0:
+                                  Singleton.topLeft = newValue!;
+                                  break;
+                                case 1:
+                                  Singleton.topRight = newValue!;
+                                  break;
+                                case 2:
+                                  Singleton.bottomLeft = newValue!;
+                                  break;
+                                case 3:
+                                  Singleton.bottomRight = newValue!;
+                                  break;
+                                default:
+                                  break;
+                              }
+                              setState(() {
+                                items[index].selectedValue = newValue!;  // Set the selected value
+                              });
+                            },
+                            hint: Text(items[index].selectedValue), // Use the hint from your MenuItem object
+                          ),
+                        ],
+                      ),
+                    );
+                  }
               );
             },
           );
         }
     );
   }
-
 }
 
 class ListItem {
   final String title;
   final List<String> options;
+  String selectedValue;
 
-  ListItem(this.title, this.options);
+  ListItem(this.title, this.options, this.selectedValue);
 }
 
 // Список элементов
 final items = <ListItem>[
-  ListItem('Top left', ['MOSFET Temperature', 'Motor Temperature', 'Motor Current','Input Current','Field Oriented Control Id (Direct Axis Current)','Field Oriented Control Iq (Quadrature Axis Current)','Current Duty Cycle','Revolutions Per Minute','Input Voltage','Ampere Hours','Ampere Hours Charged','Watt Hours','Watt Hours Charged','Tachometer Reading']),
-  ListItem('Top right', ['Option 2.1', 'Option 2.2', 'Option 2.3']),
-  ListItem('Bottom left', ['Option 2.1', 'Option 2.2', 'Option 2.3']),
-  ListItem('Bottom right', ['Option 2.1', 'Option 2.2', 'Option 2.3']),
-
-
-  // Добавьте столько элементов, сколько вам нужно
+  ListItem('Top left', ['Power', 'MOSFET Temperature', 'Motor Temperature', 'Motor Current','Input Current','Field Oriented Control Id (DAC)','Field Oriented Control Iq (QAD)','Current Duty Cycle','Revolutions Per Minute','Input Voltage','Ampere Hours','Ampere Hours Charged','Watt Hours','Watt Hours Charged','Tachometer Reading', 'Absolute Tachometer Reading', 'Position', 'Direct Axis Voltage', 'Quadrature Axis Voltage'], Singleton.topLeft),
+  ListItem('Top right', ['Power', 'MOSFET Temperature', 'Motor Temperature', 'Motor Current','Input Current','Field Oriented Control Id (DAC)','Field Oriented Control Iq (QAD)','Current Duty Cycle','Revolutions Per Minute','Input Voltage','Ampere Hours','Ampere Hours Charged','Watt Hours','Watt Hours Charged','Tachometer Reading', 'Absolute Tachometer Reading', 'Position', 'Direct Axis Voltage', 'Quadrature Axis Voltage'], Singleton.topRight),
+  ListItem('Bottom left', ['Power', 'MOSFET Temperature', 'Motor Temperature', 'Motor Current','Input Current','Field Oriented Control Id (DAC)','Field Oriented Control Iq (QAD)','Current Duty Cycle','Revolutions Per Minute','Input Voltage','Ampere Hours','Ampere Hours Charged','Watt Hours','Watt Hours Charged','Tachometer Reading', 'Absolute Tachometer Reading', 'Position', 'Direct Axis Voltage', 'Quadrature Axis Voltage'], Singleton.bottomLeft),
+  ListItem('Bottom right', ['Power', 'MOSFET Temperature', 'Motor Temperature', 'Motor Current','Input Current','Field Oriented Control Id (DAC)','Field Oriented Control Iq (QAD)','Current Duty Cycle','Revolutions Per Minute','Input Voltage','Ampere Hours','Ampere Hours Charged','Watt Hours','Watt Hours Charged','Tachometer Reading', 'Absolute Tachometer Reading', 'Position', 'Direct Axis Voltage', 'Quadrature Axis Voltage'], Singleton.bottomRight),
 ];

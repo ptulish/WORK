@@ -286,9 +286,9 @@ class _ScanState extends State<Scan> {
       }
 
       // Add the standard device "SYDBG" if it's not already present
-      if (!deviceSet.contains("SYDBG")) {
-        deviceSet.add("SYDBG");
-      }
+      // if (!deviceSet.contains("SYDBG")) {
+      //   deviceSet.add("SYDBG");
+      // }
 
       listOfDevices = deviceSet.toList();
       listOfDevices.sort(); // Sort the devices alphabetically
@@ -302,6 +302,7 @@ class _ScanState extends State<Scan> {
     if (kDebugMode) {
       print(scanSubscription);
     }
+
   }
 
 
