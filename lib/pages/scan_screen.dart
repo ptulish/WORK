@@ -266,7 +266,6 @@ class _ScanState extends State<Scan> {
   }
 
   late ScanResult result;
-
   void findDevices() async {
     Set<String> deviceSet = {};
 
@@ -285,10 +284,10 @@ class _ScanState extends State<Scan> {
         }
       }
 
-      // Add the standard device "SYDBG" if it's not already present
-      // if (!deviceSet.contains("SYDBG")) {
-      //   deviceSet.add("SYDBG");
-      // }
+      //Add the standard device "SYDBG" if it's not already present
+      if (!deviceSet.contains("SYDBG")) {
+        deviceSet.add("SYDBG");
+      }
 
       listOfDevices = deviceSet.toList();
       listOfDevices.sort(); // Sort the devices alphabetically
@@ -303,7 +302,50 @@ class _ScanState extends State<Scan> {
       print(scanSubscription);
     }
 
+    // Stop scanning after a specified time (e.g., 4 seconds)
+    Future.delayed(Duration(seconds: 4)).then((_) {
+      scanSubscription.cancel();
+      flutterBlue.stopScan();
+    });
   }
+
+  // void findDevices() async {
+  //   Set<String> deviceSet = {};
+  //
+  //   if (isConnected == true) {
+  //     device?.disconnect();
+  //   }
+  //
+  //   flutterBlue.startScan(timeout: const Duration(seconds: 4));
+  //
+  //   var scanSubscription = flutterBlue.scanResults.listen((results) async {
+  //     for (ScanResult result in results) {
+  //       String deviceName = result.device.name;
+  //
+  //       if (deviceName.startsWith("SY2")) {
+  //         deviceSet.add(deviceName);
+  //       }
+  //     }
+  //
+  //     //Add the standard device "SYDBG" if it's not already present
+  //     if (!deviceSet.contains("SYDBG")) {
+  //       deviceSet.add("SYDBG");
+  //     }
+  //
+  //     listOfDevices = deviceSet.toList();
+  //     listOfDevices.sort(); // Sort the devices alphabetically
+  //
+  //     // Move the "SYDBG" device to the last position
+  //     if (listOfDevices.remove("SYDBG")) {
+  //       listOfDevices.add("SYDBG");
+  //     }
+  //   });
+  //
+  //   if (kDebugMode) {
+  //     print(scanSubscription);
+  //   }
+  //
+  // }
 
 
   Future<void> connectDevice(String deviceNameToConnect) async {
